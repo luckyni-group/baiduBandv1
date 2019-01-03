@@ -150,6 +150,7 @@ int main(void)
 {
     uint32_t err_code;
     
+    // add this just for test github by nilian 2019-1-3
 #ifdef DEBUG_LOG
     simple_uart_config(RTS_PIN_NUMBER, TX_PIN_NUMBER, CTS_PIN_NUMBER, RX_PIN_NUMBER, HWFC);
 #endif
