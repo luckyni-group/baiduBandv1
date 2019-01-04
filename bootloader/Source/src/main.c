@@ -148,7 +148,9 @@ void wdt_stop(void)
  */
 int main(void)
 {
+    // we add this comment just for testing privilege, branch j add by niliancn@163.com
     uint32_t err_code;
+// we add both mster and j branch together to resolve conflict
 
     // add this just for testing github by nilian 2019-1-3
     // add this just for testing github privilege by luckylian
