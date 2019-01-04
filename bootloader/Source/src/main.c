@@ -17,9 +17,9 @@
  * @ingroup dfu_bootloader_api
  * @brief Bootloader project main file.
  *
- * -# Receive start data package. 
- * -# Based on start packet, prepare NVM area to store received data. 
- * -# Receive data packet. 
+ * -# Receive start data package.
+ * -# Based on start packet, prepare NVM area to store received data.
+ * -# Receive data packet.
  * -# Validate data packet.
  * -# Write Data packet to NVM.
  * -# If not finished - Wait for next packet.
@@ -60,14 +60,14 @@
 #define APP_TIMER_OP_QUEUE_SIZE         4                                                       /**< Size of timer operation queues. */
 
 
-/**@brief Function for error handling, which is called when an error has occurred. 
+/**@brief Function for error handling, which is called when an error has occurred.
  *
- * @warning This handler is an example only and does not fit a final product. You need to analyze 
+ * @warning This handler is an example only and does not fit a final product. You need to analyze
  *          how your product is supposed to react in case of error.
  *
  * @param[in] error_code  Error code supplied to the handler.
  * @param[in] line_num    Line number where the handler is called.
- * @param[in] p_file_name Pointer to the file name. 
+ * @param[in] p_file_name Pointer to the file name.
  */
 void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
@@ -90,7 +90,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
  *
  * @details This function will be called in case of an assert in the SoftDevice.
  *
- * @warning This handler is an example only and does not fit a final product. You need to analyze 
+ * @warning This handler is an example only and does not fit a final product. You need to analyze
  *          how your product is supposed to react in case of Assert.
  * @warning On assert from the SoftDevice, the system can only recover on reset.
  *
@@ -148,13 +148,14 @@ void wdt_stop(void)
  */
 int main(void)
 {
+    // we add this comment just for testing privilege, branch j add by niliancn@163.com
     uint32_t err_code;
-    
+
 #ifdef DEBUG_LOG
     simple_uart_config(RTS_PIN_NUMBER, TX_PIN_NUMBER, CTS_PIN_NUMBER, RX_PIN_NUMBER, HWFC);
 #endif
-    
-    wdt_stop(); //stop wdt whether it started or not   
+
+    wdt_stop(); //stop wdt whether it started or not
     leds_init();
 
     // This check ensures that the defined fields in the bootloader corresponds with actual
@@ -166,7 +167,7 @@ int main(void)
 
     // Initialize.
     timers_init();
-    
+
 #ifdef DEBUG_LOG
     simple_uart_putstring((const uint8_t *)"bootlader start\r\n");
     uint8_t buffer[10];
@@ -174,13 +175,13 @@ int main(void)
 
     uint8_t should_enter_bootloader =  NRF_POWER->GPREGRET & 0xff;
     uint16_t wdt_reset = (NRF_POWER->RESETREAS) & (0xFFFF);
-    
+
 #ifdef DEBUG_LOG
     simple_uart_putstring((const uint8_t *)"should_enter_bootloader is : ");
     sprintf((char *)buffer,"%d",should_enter_bootloader);
     simple_uart_putstring((const uint8_t *)buffer);
     simple_uart_putstring((const uint8_t *)"\r\n");
-    
+
     if(wdt_reset & 0x0002) {
         simple_uart_putstring((const uint8_t *)"wdt reset will goto dfu\r\n ");
     }
@@ -188,11 +189,11 @@ int main(void)
     if (should_enter_bootloader || (wdt_reset & 0x02))
     {
         nrf_gpio_pin_set(LED1);
-        
+
 #ifdef DEBUG_LOG
     simple_uart_putstring((const uint8_t *)"will enter dfu bootlaoder\r\n");
 #endif
-        
+
         // Initiate an update of the firmware.
         err_code = bootloader_dfu_start();
         APP_ERROR_CHECK(err_code);
@@ -206,29 +207,29 @@ int main(void)
     simple_uart_putstring((const uint8_t *)"will lunch applicaiton \r\n");
 #endif
         leds_off();
-        
+
         //set retain register
         NRF_POWER->GPREGRET = 0x00;
         //clear AIRCR register
         NRF_POWER->RESETREAS = 0x04;
 
         if(wdt_reset & 0x02) {
-           NRF_POWER->RESETREAS = 0x02; 
+           NRF_POWER->RESETREAS = 0x02;
         }
 
         // Select a bank region to use as application region.
         // @note: Only applications running from DFU_BANK_0_REGION_START is supported.
         bootloader_app_start(DFU_BANK_0_REGION_START);
-        
+
     }
-    
+
 #ifdef DEBUG_LOG
     simple_uart_putstring((const uint8_t *)"can not start applicaiton so reenter OTA \r\n");
 #endif
     leds_off();
-    
+
     //comes here should reenter DFU
     NRF_POWER->GPREGRET = 0x01;
-    
+
     NVIC_SystemReset();
 }
